@@ -1,70 +1,59 @@
-// useState ---> hook --> function by react
-import { useState, useEffect, useRef } from "react";
-import { useCutomHook } from "./useCustomHook";
-// hooks
-// useState ---> state management ----> variable management
+// props
+import Card from "./components/Card";
+import { Cart } from "./components/Cart";
+import H1 from "./components/H1";
+import { useState } from "react";
+// react is unidirectional
+// data -> parent to child
+
+// 6 - boxes - same design
+
+// create one box
+// reuse it multiple times with different data
 
 const App = () => {
-  const [data, setData] = useState([]);
-  const ref = useRef();
-  const { width, height } = useCutomHook();
+  const name = "John";
+  const age = 30;
+  const [selectedItems, setSelectedItems] = useState([]);
+  const services = [
+    {
+      id: 1,
+      title: "Web Development",
+      price: 1000,
+    },
+    {
+      id: 2,
+      title: "Graphic Design",
+      price: 800,
+    },
+  ];
 
-  console.log("width:", width, "height:", height);
+  const addToCart = (item) => {
+    setSelectedItems([...selectedItems, item]);
+  };
 
-  useEffect(() => {
-    const getData = async () => {
-      try {
-        const resp = await fetch(
-          "https://api.sampleapis.com/cartoons/cartoons2D",
-        );
-        const json = await resp.json();
-        setData(json);
-      } catch (err) {
-        setData(err.message);
-      }
-    };
-    getData();
-  }, []);
-
-  useEffect(() => {
-    ref.current.style = "background-color: lightgray";
-  }, [data]);
+  const removeFromCart = (item) => {
+    const updatedItems = selectedItems.filter(
+      (selectedItem) => selectedItem.id !== item.id,
+    );
+    setSelectedItems(updatedItems);
+  };
 
   return (
-    <div ref={ref}>
-      {/* <h2>Count: {state}</h2> */}
-      {/* <button onClick={updateCount}>increment</button> */}
-      {data.map((item) => {
-        return (
-          <div>
-            <h1>{item.title}</h1>
-            <img src={item.image} alt={item.title} width={300} heigh={300} />
-            <p>Episodes: {item.episodes}</p>
-            {item.creator.map((c) => {
-              return <p>Creator: {c}</p>;
-            })}
-          </div>
-        );
-      })}
+    <div>
+      <H1 nameValue={name} age={age} />
+      {services.map((service) => (
+        <Card
+          key={service.id}
+          addToCart={addToCart}
+          service={service}
+          selectedItems={selectedItems}
+          removeFromCart={removeFromCart}
+        />
+      ))}
+      <Cart selectedItems={selectedItems} />
     </div>
   );
 };
-
-// {
-//     "title": "Spongebob Squarepants",
-//     "year": 1999,
-//     "creator": [
-//         "Stephen Hillenburg"
-//     ],
-//     "rating": "TV-Y",
-//     "genre": [
-//         "Comedy",
-//         "Family"
-//     ],
-//     "runtime_in_minutes": 23,
-//     "episodes": 272,
-//     "image": "https://nick.mtvnimages.com/uri/mgid:arc:content:nick.com:9cd2df6e-63c7-43da-8bde-8d77af9169c7?quality=0.7",
-//     "id": 1
-// }
 
 export default App;
